@@ -121,7 +121,7 @@ public class Player implements matchup.sim.Player {
          * 1. has opponent skill distribution changed from last game to the game before
          * 2. min/max of player skills from the last distribution
          * 3. avg number of distinct numbers in the past home and away lineups
-         *//*
+         */
         Boolean g5_playerA = false;
         Boolean g5_playerB = false;
         if(games.get(games.size()-1).playerA.name.equals("g5")) {
@@ -244,7 +244,7 @@ public class Player implements matchup.sim.Player {
             } else {
                 avgNumberAway = sum / 3;
             }
-        }*/
+        }
 
         /* End of analysis */
 
@@ -313,7 +313,7 @@ public class Player implements matchup.sim.Player {
 
 
 	/* three different strategies to divide into lines */
-	public List<List<Integer>> rankedLines(List<Integer> skills) {
+	public static List<List<Integer>> rankedLines(List<Integer> skills) {
 			Collections.sort(skills);
 			distribution = new ArrayList<List<Integer>>();
 			int index = 0;
@@ -328,7 +328,7 @@ public class Player implements matchup.sim.Player {
 			return distribution;
 	}
 
-	public List<List<Integer>> evenLines(List<Integer> skills)  {
+	public static List<List<Integer>> evenLines(List<Integer> skills)  {
 			Collections.sort(skills);
 			distribution = new ArrayList<List<Integer>>();
 			int i = 0;
@@ -347,7 +347,7 @@ public class Player implements matchup.sim.Player {
 			return distribution;
 	}
 
-	public List<List<Integer>> randLines(List<Integer> skills){
+	public static List<List<Integer>> randLines(List<Integer> skills){
 		distribution = new ArrayList<List<Integer>>();
 		List<Integer> index = new ArrayList<Integer>();
 		for (int i=0; i<15; ++i) index.add(i);
