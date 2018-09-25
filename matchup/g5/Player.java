@@ -122,130 +122,148 @@ public class Player implements matchup.sim.Player {
          * 2. min/max of player skills from the last distribution
          * 3. avg number of distinct numbers in the past home and away lineups
          */
+        Boolean analysisResultUsable = false;
         Boolean g5_playerA = false;
         Boolean g5_playerB = false;
-        if(games.get(games.size()-1).playerA.name.equals("g5")) {
-            g5_playerA = true;
-        } else {
-            g5_playerB = true;
-        }
-
         Boolean oppoSkillChanged = false;
         int oppoMinSkill = 12;
         int oppoMaxSkill = -1;
         double avgNumberHome = -1;
         double avgNumberAway = -1;
+        if (games.size() >= 4) {
+            analysisResultUsable = true;
+            if(games.get(games.size()-1).playerA.name.equals("g5")) {
+                g5_playerA = true;
+            } else {
+                g5_playerB = true;
+            }
 
-        if (g5_playerA) {
-            List<Integer> a = games.get(games.size()-1).playerB.skills;
-            List<Integer> b = games.get(games.size()-3).playerB.skills;
-            Collections.sort(a);
-            Collections.sort(b);
-            oppoSkillChanged = a.equals(b);
-            for(int i = 0; i < 15; i++) {
-                if (games.get(games.size()-1).playerB.skills.get(i) < oppoMinSkill) {
-                    oppoMinSkill = games.get(games.size()-1).playerB.skills.get(i);
+
+            if (g5_playerA) {
+                List<Integer> a = games.get(games.size()-1).playerB.skills;
+                List<Integer> b = games.get(games.size()-3).playerB.skills;
+                System.out.println("====== historical opponent skills distribution ======");
+                System.out.println("Opponent Skills (prev game) = " + a);
+                System.out.println("Opponent Skills (two games before)" + b);
+
+                Collections.sort(a);
+                Collections.sort(b);
+                oppoSkillChanged = !a.equals(b);
+                for(int i = 0; i < 15; i++) {
+                    if (games.get(games.size()-1).playerB.skills.get(i) < oppoMinSkill) {
+                        oppoMinSkill = games.get(games.size()-1).playerB.skills.get(i);
+                    }
+                    if (games.get(games.size()-1).playerB.skills.get(i) > oppoMaxSkill) {
+                        oppoMaxSkill = games.get(games.size()-1).playerB.skills.get(i);
+                    }
                 }
-                if (games.get(games.size()-1).playerB.skills.get(i) > oppoMaxSkill) {
-                    oppoMaxSkill = games.get(games.size()-1).playerB.skills.get(i);
+                // avg distinct number for last game (will decide on whether it is home or away) 
+                List<Integer> dist_number_per_line = new ArrayList<Integer>();
+                for(int i = 0; i < 3; i++) {
+                    dist_number_per_line.add(0);
+                    Set<Integer> mySet = new HashSet<Integer>();
+                    for (int j = 0; j < 5; j++) {
+                        if (!mySet.contains(games.get(games.size() - 1).playerB.distribution.get(i).get(j)))
+                            dist_number_per_line.set(i, dist_number_per_line.get(i) + 1);
+                        mySet.add(games.get(games.size() - 1).playerB.distribution.get(i).get(j));
+                    }
                 }
-            }
-            /* avg distinct number for last game (will decide on whether it is home or away) */
-            List<Integer> dist_number_per_line = new ArrayList<Integer>();
-            for(int i = 0; i < 3; i++) {
-                dist_number_per_line.add(0);
-                Set<Integer> mySet = new HashSet<Integer>();
-                for (int j = 0; j < 5; j++) {
-                    if (!mySet.contains(games.get(games.size() - 1).playerB.distribution.get(i).get(j)))
-                        dist_number_per_line.set(i, dist_number_per_line.get(i) + 1);
-                    mySet.add(games.get(games.size() - 1).playerB.distribution.get(i).get(j));
+                int sum = 0;
+                for (int i = 0; i < dist_number_per_line.size(); i++) {
+                    sum = sum + dist_number_per_line.get(i);
                 }
-            }
-            int sum = 0;
-            for (int i = 0; i < dist_number_per_line.size(); i++) {
-                sum = sum + dist_number_per_line.get(i);
-            }
-            if (games.get(games.size() - 1).playerB.isHome) {
-                avgNumberHome = sum / 3;
+                if (games.get(games.size() - 1).playerB.isHome) {
+                    avgNumberHome = sum / 3;
+                } else {
+                    avgNumberAway = sum / 3;
+                }
+                // avg distinct number for 2nd last game (will decide on whether it is home or away) 
+                dist_number_per_line = new ArrayList<Integer>();
+                for(int i = 0; i < 3; i++) {
+                    dist_number_per_line.add(0);
+                    Set<Integer> mySet = new HashSet<Integer>();
+                    for (int j = 0; j < 5; j++) {
+                        if (!mySet.contains(games.get(games.size() - 2).playerB.distribution.get(i).get(j)))
+                            dist_number_per_line.set(i, dist_number_per_line.get(i) + 1);
+                        mySet.add(games.get(games.size() - 2).playerB.distribution.get(i).get(j));
+                    }
+                }
+                sum = 0;
+                for (int i = 0; i < dist_number_per_line.size(); i++) {
+                    sum = sum + dist_number_per_line.get(i);
+                }
+                if (games.get(games.size() - 2).playerB.isHome) {
+                    avgNumberHome = sum / 3;
+                } else {
+                    avgNumberAway = sum / 3;
+                }
             } else {
-                avgNumberAway = sum / 3;
-            }
-            /* avg distinct number for 2nd last game (will decide on whether it is home or away) */
-            dist_number_per_line = new ArrayList<Integer>();
-            for(int i = 0; i < 3; i++) {
-                dist_number_per_line.add(0);
-                Set<Integer> mySet = new HashSet<Integer>();
-                for (int j = 0; j < 5; j++) {
-                    if (!mySet.contains(games.get(games.size() - 2).playerB.distribution.get(i).get(j)))
-                        dist_number_per_line.set(i, dist_number_per_line.get(i) + 1);
-                    mySet.add(games.get(games.size() - 2).playerB.distribution.get(i).get(j));
+                List<Integer> a = games.get(games.size()-1).playerA.skills;
+                List<Integer> b = games.get(games.size()-3).playerA.skills;
+                Collections.sort(a);
+                Collections.sort(b);
+                oppoSkillChanged = !a.equals(b);
+                for(int i = 0; i < 15; i++) {
+                    if (games.get(games.size()-1).playerA.skills.get(i) < oppoMinSkill) {
+                        oppoMinSkill = games.get(games.size()-1).playerA.skills.get(i);
+                    }
+                    if (games.get(games.size()-1).playerA.skills.get(i) > oppoMaxSkill) {
+                        oppoMaxSkill = games.get(games.size()-1).playerA.skills.get(i);
+                    }
                 }
-            }
-            sum = 0;
-            for (int i = 0; i < dist_number_per_line.size(); i++) {
-                sum = sum + dist_number_per_line.get(i);
-            }
-            if (games.get(games.size() - 2).playerB.isHome) {
-                avgNumberHome = sum / 3;
-            } else {
-                avgNumberAway = sum / 3;
-            }
-        } else {
-            List<Integer> a = games.get(games.size()-1).playerA.skills;
-            List<Integer> b = games.get(games.size()-3).playerA.skills;
-            Collections.sort(a);
-            Collections.sort(b);
-            oppoSkillChanged = a.equals(b);
-            for(int i = 0; i < 15; i++) {
-                if (games.get(games.size()-1).playerA.skills.get(i) < oppoMinSkill) {
-                    oppoMinSkill = games.get(games.size()-1).playerA.skills.get(i);
+                // avg distinct number for last game (will decide on whether it is home or away) 
+                List<Integer> dist_number_per_line = new ArrayList<Integer>();
+                for(int i = 0; i < 3; i++) {
+                    dist_number_per_line.add(0);
+                    Set<Integer> mySet = new HashSet<Integer>();
+                    for (int j = 0; j < 5; j++) {
+                        if (!mySet.contains(games.get(games.size() - 1).playerA.distribution.get(i).get(j)))
+                            dist_number_per_line.set(i, dist_number_per_line.get(i) + 1);
+                        mySet.add(games.get(games.size() - 1).playerA.distribution.get(i).get(j));
+                    }
                 }
-                if (games.get(games.size()-1).playerA.skills.get(i) > oppoMaxSkill) {
-                    oppoMaxSkill = games.get(games.size()-1).playerA.skills.get(i);
+                int sum = 0;
+                for (int i = 0; i < dist_number_per_line.size(); i++) {
+                    sum = sum + dist_number_per_line.get(i);
                 }
-            }
-            /* avg distinct number for last game (will decide on whether it is home or away) */
-            List<Integer> dist_number_per_line = new ArrayList<Integer>();
-            for(int i = 0; i < 3; i++) {
-                dist_number_per_line.add(0);
-                Set<Integer> mySet = new HashSet<Integer>();
-                for (int j = 0; j < 5; j++) {
-                    if (!mySet.contains(games.get(games.size() - 1).playerA.distribution.get(i).get(j)))
-                        dist_number_per_line.set(i, dist_number_per_line.get(i) + 1);
-                    mySet.add(games.get(games.size() - 1).playerA.distribution.get(i).get(j));
+                if (games.get(games.size() - 1).playerA.isHome) {
+                    avgNumberHome = sum / 3;
+                } else {
+                    avgNumberAway = sum / 3;
                 }
-            }
-            int sum = 0;
-            for (int i = 0; i < dist_number_per_line.size(); i++) {
-                sum = sum + dist_number_per_line.get(i);
-            }
-            if (games.get(games.size() - 1).playerA.isHome) {
-                avgNumberHome = sum / 3;
-            } else {
-                avgNumberAway = sum / 3;
-            }
-            /* avg distinct number for 2nd last game (will decide on whether it is home or away) */
-            dist_number_per_line = new ArrayList<Integer>();
-            for(int i = 0; i < 3; i++) {
-                dist_number_per_line.add(0);
-                Set<Integer> mySet = new HashSet<Integer>();
-                for (int j = 0; j < 5; j++) {
-                    if (!mySet.contains(games.get(games.size() - 2).playerA.distribution.get(i).get(j)))
-                        dist_number_per_line.set(i, dist_number_per_line.get(i) + 1);
-                    mySet.add(games.get(games.size() - 2).playerA.distribution.get(i).get(j));
+                // avg distinct number for 2nd last game (will decide on whether it is home or away) 
+                dist_number_per_line = new ArrayList<Integer>();
+                for(int i = 0; i < 3; i++) {
+                    dist_number_per_line.add(0);
+                    Set<Integer> mySet = new HashSet<Integer>();
+                    for (int j = 0; j < 5; j++) {
+                        if (!mySet.contains(games.get(games.size() - 2).playerA.distribution.get(i).get(j)))
+                            dist_number_per_line.set(i, dist_number_per_line.get(i) + 1);
+                        mySet.add(games.get(games.size() - 2).playerA.distribution.get(i).get(j));
+                    }
                 }
-            }
-            sum = 0;
-            for (int i = 0; i < dist_number_per_line.size(); i++) {
-                sum = sum + dist_number_per_line.get(i);
-            }
-            if (games.get(games.size() - 2).playerA.isHome) {
-                avgNumberHome = sum / 3;
-            } else {
-                avgNumberAway = sum / 3;
+                sum = 0;
+                for (int i = 0; i < dist_number_per_line.size(); i++) {
+                    sum = sum + dist_number_per_line.get(i);
+                }
+                if (games.get(games.size() - 2).playerA.isHome) {
+                    avgNumberHome = sum / 3;
+                } else {
+                    avgNumberAway = sum / 3;
+                }
             }
         }
 
+        /* test */
+        if (analysisResultUsable) {
+            System.out.println("opponent skills changed? " + oppoSkillChanged);
+            System.out.println("opponent min skill = " + oppoMinSkill);
+            System.out.println("opponent max skill = " + oppoMaxSkill);
+            System.out.println("Avg number of distinct skills per line when home = " + avgNumberHome);
+            System.out.println("Avg number of distinct skills per line when home = " + avgNumberAway);
+        } else {
+            System.out.println("Not enough games played to generate history analysis.");
+        }
         /* End of analysis */
 
         int choice = rand.nextInt(4);
