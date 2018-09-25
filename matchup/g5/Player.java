@@ -313,7 +313,7 @@ public class Player implements matchup.sim.Player {
 
 
 	/* three different strategies to divide into lines */
-	public static List<List<Integer>> rankedLines(List<Integer> skills) {
+	public List<List<Integer>> rankedLines(List<Integer> skills) {
 			Collections.sort(skills);
 			distribution = new ArrayList<List<Integer>>();
 			int index = 0;
@@ -328,7 +328,7 @@ public class Player implements matchup.sim.Player {
 			return distribution;
 	}
 
-	public static List<List<Integer>> evenLines(List<Integer> skills)  {
+	public List<List<Integer>> evenLines(List<Integer> skills)  {
 			Collections.sort(skills);
 			distribution = new ArrayList<List<Integer>>();
 			int i = 0;
@@ -347,7 +347,7 @@ public class Player implements matchup.sim.Player {
 			return distribution;
 	}
 
-	public static List<List<Integer>> randLines(List<Integer> skills){
+	public List<List<Integer>> randLines(List<Integer> skills){
 		distribution = new ArrayList<List<Integer>>();
 		List<Integer> index = new ArrayList<Integer>();
 		for (int i=0; i<15; ++i) index.add(i);
