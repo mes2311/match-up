@@ -145,6 +145,41 @@ public class Player implements matchup.sim.Player {
     return randSkills;
   }
 
+    /* three different strategies to divide into lines */
+    public List<List<Integer>> three_tier_distribution(List<Integer> skills) {
+        Collections.sort(skills);
+        distribution = new ArrayList<List<Integer>>();
+        int index = 0;
+        for(int i = 0; i < 3; i++) {
+            List<Integer> line = new ArrayList<Integer>();
+            for(int j = 0; j < 5; j++) {
+                line.append(skills[index]);
+                index++;
+            }
+            distribution.append(line);
+        }
+        return distribution;
+    }
+
+    public List<List<Integer>> diversified_distribution(List<Integer> skills)  {
+        Collections.sort(skills);
+        distribution = new ArrayList<List<Integer>>();
+        int i = 0;
+        List<Integer> line1 = new ArrayList<Integer>();
+        List<Integer> line2 = new ArrayList<Integer>();
+        List<Integer> line3 = new ArrayList<Integer>();
+        while(i < 15) {
+            line1.append(skills[i]);
+            line1.append(skills[i + 1]);
+            line1.append(skills[i + 2]);
+            i = i + 3;
+        }
+        distribution.append(line1);
+        distribution.append(line2);
+        distribution.append(line3);
+        return distribution;
+    }
+
     /* called every home/away switch */
     public List<List<Integer>> getDistribution(List<Integer> opponentSkills, boolean isHome) {
         System.out.println("last distribution: ");
@@ -181,6 +216,8 @@ public class Player implements matchup.sim.Player {
 
     	return distribution;
     }
+
+
 
 
     /* called every round of play
