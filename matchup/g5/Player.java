@@ -121,9 +121,9 @@ public class Player implements matchup.sim.Player {
          * 1. has opponent skill distribution changed from last game to the game before
          * 2. min/max of player skills from the last distribution
          * 3. avg number of distinct numbers in the past home and away lineups
-         */
-        g5_playerA = false;
-        g5_playerB = false;
+         *//*
+        Boolean g5_playerA = false;
+        Boolean g5_playerB = false;
         if(games.get(games.size()-1).playerA.name.equals("g5")) {
             g5_playerA = true;
         } else {
@@ -136,8 +136,12 @@ public class Player implements matchup.sim.Player {
         double avgNumberHome = -1;
         double avgNumberAway = -1;
 
-        if g5_playerA {
-            oppoSkillChanged = Collection.sort(games.get(games.size()-1).playerB.skills).equals(Collection.sort(games.get(games.size()-3).playerB.skills));
+        if (g5_playerA) {
+            List<Integer> a = games.get(games.size()-1).playerB.skills;
+            List<Integer> b = games.get(games.size()-3).playerB.skills;
+            Collections.sort(a);
+            Collections.sort(b);
+            oppoSkillChanged = a.equals(b);
             for(int i = 0; i < 15; i++) {
                 if (games.get(games.size()-1).playerB.skills.get(i) < oppoMinSkill) {
                     oppoMinSkill = games.get(games.size()-1).playerB.skills.get(i);
@@ -147,19 +151,19 @@ public class Player implements matchup.sim.Player {
                 }
             }
             /* avg distinct number for last game (will decide on whether it is home or away) */
-            dist_number_per_line = new ArrayList<Integer>();
+            List<Integer> dist_number_per_line = new ArrayList<Integer>();
             for(int i = 0; i < 3; i++) {
                 dist_number_per_line.add(0);
-                Set<Integer> a = new HashSet<Integer>();
+                Set<Integer> mySet = new HashSet<Integer>();
                 for (int j = 0; j < 5; j++) {
-                    if (!a.contains(games.get(games.size() - 1).playerB.distribution[i][j]))
-                        dist_number_per_line[i] = dist_number_per_line[i] + 1;
-                    a.add(games.get(games.size() - 1).playerB.distribution[i][j]);
+                    if (!mySet.contains(games.get(games.size() - 1).playerB.distribution.get(i).get(j)))
+                        dist_number_per_line.set(i, dist_number_per_line.get(i) + 1);
+                    mySet.add(games.get(games.size() - 1).playerB.distribution.get(i).get(j));
                 }
             }
             int sum = 0;
             for (int i = 0; i < dist_number_per_line.size(); i++) {
-                sum = sum + dist_number_per_line[i]
+                sum = sum + dist_number_per_line.get(i);
             }
             if (games.get(games.size() - 1).playerB.isHome) {
                 avgNumberHome = sum / 3;
@@ -170,16 +174,16 @@ public class Player implements matchup.sim.Player {
             dist_number_per_line = new ArrayList<Integer>();
             for(int i = 0; i < 3; i++) {
                 dist_number_per_line.add(0);
-                Set<Integer> a = new HashSet<Integer>();
+                Set<Integer> mySet = new HashSet<Integer>();
                 for (int j = 0; j < 5; j++) {
-                    if (!a.contains(games.get(games.size() - 2).playerB.distribution[i][j]))
-                        dist_number_per_line[i] = dist_number_per_line[i] + 1;
-                    a.add(games.get(games.size() - 2).playerB.distribution[i][j]);
+                    if (!mySet.contains(games.get(games.size() - 2).playerB.distribution.get(i).get(j)))
+                        dist_number_per_line.set(i, dist_number_per_line.get(i) + 1);
+                    mySet.add(games.get(games.size() - 2).playerB.distribution.get(i).get(j));
                 }
             }
-            int sum = 0;
+            sum = 0;
             for (int i = 0; i < dist_number_per_line.size(); i++) {
-                sum = sum + dist_number_per_line[i]
+                sum = sum + dist_number_per_line.get(i);
             }
             if (games.get(games.size() - 2).playerB.isHome) {
                 avgNumberHome = sum / 3;
@@ -187,7 +191,11 @@ public class Player implements matchup.sim.Player {
                 avgNumberAway = sum / 3;
             }
         } else {
-            oppoSkillChanged = Collection.sort(games.get(games.size()-1).playerA.skills).equals(Collection.sort(games.get(games.size()-3).playerB.skills));
+            List<Integer> a = games.get(games.size()-1).playerA.skills;
+            List<Integer> b = games.get(games.size()-3).playerA.skills;
+            Collections.sort(a);
+            Collections.sort(b);
+            oppoSkillChanged = a.equals(b);
             for(int i = 0; i < 15; i++) {
                 if (games.get(games.size()-1).playerA.skills.get(i) < oppoMinSkill) {
                     oppoMinSkill = games.get(games.size()-1).playerA.skills.get(i);
@@ -197,19 +205,19 @@ public class Player implements matchup.sim.Player {
                 }
             }
             /* avg distinct number for last game (will decide on whether it is home or away) */
-            dist_number_per_line = new ArrayList<Integer>();
+            List<Integer> dist_number_per_line = new ArrayList<Integer>();
             for(int i = 0; i < 3; i++) {
                 dist_number_per_line.add(0);
-                Set<Integer> a = new HashSet<Integer>();
+                Set<Integer> mySet = new HashSet<Integer>();
                 for (int j = 0; j < 5; j++) {
-                    if (!a.contains(games.get(games.size() - 1).playerA.distribution[i][j]))
-                        dist_number_per_line[i] = dist_number_per_line[i] + 1;
-                    a.add(games.get(games.size() - 1).playerA.distribution[i][j]);
+                    if (!mySet.contains(games.get(games.size() - 1).playerA.distribution.get(i).get(j)))
+                        dist_number_per_line.set(i, dist_number_per_line.get(i) + 1);
+                    mySet.add(games.get(games.size() - 1).playerA.distribution.get(i).get(j));
                 }
             }
             int sum = 0;
             for (int i = 0; i < dist_number_per_line.size(); i++) {
-                sum = sum + dist_number_per_line[i]
+                sum = sum + dist_number_per_line.get(i);
             }
             if (games.get(games.size() - 1).playerA.isHome) {
                 avgNumberHome = sum / 3;
@@ -220,23 +228,23 @@ public class Player implements matchup.sim.Player {
             dist_number_per_line = new ArrayList<Integer>();
             for(int i = 0; i < 3; i++) {
                 dist_number_per_line.add(0);
-                Set<Integer> a = new HashSet<Integer>();
+                Set<Integer> mySet = new HashSet<Integer>();
                 for (int j = 0; j < 5; j++) {
-                    if (!a.contains(games.get(games.size() - 2).playerA.distribution[i][j]))
-                        dist_number_per_line[i] = dist_number_per_line[i] + 1;
-                    a.add(games.get(games.size() - 2).playerA.distribution[i][j]);
+                    if (!mySet.contains(games.get(games.size() - 2).playerA.distribution.get(i).get(j)))
+                        dist_number_per_line.set(i, dist_number_per_line.get(i) + 1);
+                    mySet.add(games.get(games.size() - 2).playerA.distribution.get(i).get(j));
                 }
             }
-            int sum = 0;
+            sum = 0;
             for (int i = 0; i < dist_number_per_line.size(); i++) {
-                sum = sum + dist_number_per_line[i]
+                sum = sum + dist_number_per_line.get(i);
             }
             if (games.get(games.size() - 2).playerA.isHome) {
                 avgNumberHome = sum / 3;
             } else {
                 avgNumberAway = sum / 3;
             }
-        }
+        }*/
 
         /* End of analysis */
 
