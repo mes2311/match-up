@@ -121,7 +121,17 @@ public class Player implements matchup.sim.Player {
 
 				// Choose which strategy to play based on last game
 
-		    this.skills = defensive;
+				int choice = rand.nextInt(4);
+				switch(choice){
+					case 0:
+						this.skills = aggressive; break;
+					case 1:
+						this.skills = defensive; break;
+					case 2:
+						this.skills = mixed; break;
+					case 3:
+					this.skills = semiRand; break;
+				}
             return this.skills;
         }
 
@@ -172,22 +182,22 @@ public class Player implements matchup.sim.Player {
   }
 
 	/* three different strategies to divide into lines */
-	public List<List<Integer>> three_tier_distribution(List<Integer> skills) {
+	public List<List<Integer>> rankedLines(List<Integer> skills) {
 			Collections.sort(skills);
 			distribution = new ArrayList<List<Integer>>();
 			int index = 0;
 			for(int i = 0; i < 3; i++) {
 					List<Integer> line = new ArrayList<Integer>();
 					for(int j = 0; j < 5; j++) {
-							line.append(skills[index]);
+							line.add(skills.get(index));
 							index++;
 					}
-					distribution.append(line);
+					distribution.add(line);
 			}
 			return distribution;
 	}
 
-	public List<List<Integer>> diversified_distribution(List<Integer> skills)  {
+	public List<List<Integer>> evenLines(List<Integer> skills)  {
 			Collections.sort(skills);
 			distribution = new ArrayList<List<Integer>>();
 			int i = 0;
@@ -195,49 +205,52 @@ public class Player implements matchup.sim.Player {
 			List<Integer> line2 = new ArrayList<Integer>();
 			List<Integer> line3 = new ArrayList<Integer>();
 			while(i < 15) {
-					line1.append(skills[i]);
-					line1.append(skills[i + 1]);
-					line1.append(skills[i + 2]);
+					line1.add(skills.get(i));
+					line2.add(skills.get(i+1));
+					line3.add(skills.get(i+2));
 					i = i + 3;
 			}
-			distribution.append(line1);
-			distribution.append(line2);
-			distribution.append(line3);
+			distribution.add(line1);
+			distribution.add(line2);
+			distribution.add(line3);
 			return distribution;
+	}
+
+	public List<List<Integer>> randLines(List<Integer> skills){
+		distribution = new ArrayList<List<Integer>>();
+		List<Integer> index = new ArrayList<Integer>();
+		for (int i=0; i<15; ++i) index.add(i);
+
+		Collections.shuffle(index);
+		int n = 0;
+		for (int i=0; i<3; ++i) {
+			List<Integer> row = new ArrayList<Integer>();
+			for (int j=0; j<5; ++j) {
+				row.add(skills.get(index.get(n)));
+				++n;
+			}
+			distribution.add(row);
+		}
+		return distribution;
 	}
 
 
     /* called every home/away switch */
-    public List<List<Integer>> getDistribution(List<Integer> opponentSkills, boolean isHome) {
-        //System.out.println("last distribution: ");
-        //System.out.println(distribution);
+    public List<List<Integer>> getDistribution(List<Integer> opponentSkills, boolean isHome){
     	distribution = new ArrayList<List<Integer>>();
-        // If we're the home team, create variance in our line
-        if (isHome) {
+      // update our private variables
+      this.isHome = isHome;
+      this.opponentSkills = opponentSkills;
 
-
-        }
-    	List<Integer> index = new ArrayList<Integer>();
-    	for (int i=0; i<15; ++i) index.add(i);
-
-
-		Collections.shuffle(index);
-		int n = 0;
-    	for (int i=0; i<3; ++i) {
-    		List<Integer> row = new ArrayList<Integer>();
-    		for (int j=0; j<5; ++j) {
-    			row.add(skills.get(index.get(n)));
-    			++n;
-    		}
-
-    		distribution.add(row);
-    	}
-
-        // update our private variables
-        this.isHome = isHome;
-        this.opponentSkills = opponentSkills;
-
-
+			int choice = rand.nextInt(3);
+			switch(choice){
+				case 0:
+					distribution = rankedLines(this.skills); break;
+				case 1:
+					distribution = evenLines(this.skills); break;
+				case 2:
+					distribution = randLines(this.skills); break;
+			}
     	return distribution;
     }
 
@@ -251,31 +264,17 @@ public class Player implements matchup.sim.Player {
 
         /* log opponent data */
         opponentDistribution.add(opponentRound);
-
-        /* print tests */
-        //System.out.println(isHome);
-
         /* permutation when isHome = True */
         if (isHome == true) {
             int selected_line_score = -6;
             int selected_line_index = 0; // default first line, will be overwritten
             for (int i = 0; i < availableRows.size(); i++) {
-
-                /* TEST */
-                //System.out.println("--------------------------------------------------------------------");
-                //System.out.println("Line permuting currently: " + distribution.get(availableRows.get(i)));
-                //System.out.println("--------------------------------------------------------------------");
-                /* TEST END */
-                /* clear the return variables */
                 best_permuted_score_cur_line = -6; // resets best_permuted_score_cur_line for each line permutation
                 permute_result = null;
 
                 line_permute(distribution.get(availableRows.get(i)), opponentRound);
 
                 if (best_permuted_score_cur_line > selected_line_score) {
-                    /* test */
-                    //System.out.println("1.!!!!!!!!!!!!!!!!!!");
-
                     selected_line_score = best_permuted_score_cur_line;
                     selected_line_index = i;
                     round = permute_result;
