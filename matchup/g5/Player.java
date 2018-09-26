@@ -305,6 +305,29 @@ public class Player implements matchup.sim.Player {
 
     /* End of analysis */
 
+		/* Tested throwing a random strategy with a certain probability
+		 * but did not improve results
+		int skip = rand.nextInt(3);
+		if(skip == 0){
+			int strat = rand.nextInt(6);
+			switch(strat){
+				case 0:
+					this.skills = counter10; this.prevStrategy = "counter10"; break;
+				case 1:
+					this.skills = counter7; this.prevStrategy = "counter7"; break;
+				case 2:
+					this.skills = defeat7;  this.prevStrategy = "defeat7"; break;
+				case 3:
+					this.skills = aggressive; this.prevStrategy = "aggressive"; break;
+				case 4:
+					this.skills = defensive; this.prevStrategy = "defensive"; break;
+				case 5:
+					this.skills = mixed; this.prevStrategy = "mixed"; break;
+			}
+			return this.skills;
+		}
+		*/
+
 		// Use analysis to throw a counter
 		if (analysisResultUsable){
 			if(!oppoSkillChanged){
