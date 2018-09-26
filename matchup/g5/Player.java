@@ -27,7 +27,7 @@ public class Player implements matchup.sim.Player {
   private boolean isHome;
   private String prevGameResult;
 	private String prevStrategy; //variable to store strategy used in previous game
-	private String prevLines; //variable to stor previous line strategy
+	private String prevLines; //variable to store previous line strategy
 	private double oppAwayDistinct = 1.0;
 	private double oppHomeDistinct = 2.0;
 
@@ -129,7 +129,7 @@ public class Player implements matchup.sim.Player {
 	    }
 		}
 
-		//Determin result
+		//Determine result
 		if(ourScore < oppScore){
 			prevGameResult = "l";
     }
@@ -374,7 +374,7 @@ public class Player implements matchup.sim.Player {
 						this.prevStrategy = "defensive";
 					}
 				}
-				else if(prevGameResult == "t"){ //Stay the same
+				else { //Stay the same, we tied
 					switch(prevStrategy){
 						case "counter10":
 							this.skills = counter10; break;
@@ -398,13 +398,13 @@ public class Player implements matchup.sim.Player {
 			int choice = rand.nextInt(4);
 			switch(choice){
 				case 0:
-					this.skills = aggressive; break;
+					this.skills = aggressive; this.prevStrategy = "aggressive"; break;
 	      case 1:
-	        this.skills = defensive; break;
+	        this.skills = defensive; this.prevStrategy = "defensive"; break;
 	      case 2:
-	        this.skills = mixed; break;
+	        this.skills = mixed; this.prevStrategy = "mixed"; break;
 	      case 3:
-	        this.skills = semiRand; break;
+	        this.skills = semiRand; this.prevStrategy = "semiRand"; break;
 	     }
 		}
     return this.skills;
